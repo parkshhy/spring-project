@@ -1,0 +1,27 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layouts/main_template}">
+
+<!-- 3번째 줄 타임리프 레이아웃 다이얼렉트를 사용하기 위해 XML 네임스페이스를 추가한다. -->
+<!-- layout:decorator 속성에 공통적인 템플릿으로 이용하는 Decorator 뷰이름을 지정한다. -->
+
+<head>
+  <title>블러그 메인</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body style="background-color:#F0FFF0;">
+
+<!-- 대체하고 싶은 요소에 layout:fragment 속성을 부여한다.-->
+	<div layout:fragment="content">	
+	
+		<h1>블러그 메인</h1>
+	</div>
+	 
+</body>
+</html>

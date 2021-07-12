@@ -1,0 +1,68 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layouts/main_template}">
+	
+<head>
+ <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body style="background-color:#F0FFF0;">
+<div layout:fragment="content">
+	<div style="color: green; font-size: 3.5em; font-weight: bold; margin-left:10px">Blog</div>
+	<form id="member" action="list.html" th:action="@{/user/register}" th:object="${member}" method="POST">
+		<table>
+			<tr>
+				
+				<td><input class="form-control form-control" type="text" name="userId" th:field="*{userId}" placeholder="아이디"></td>
+				<td><span class="error_message" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}" >userId의 에러 메시지</span></td>
+			</tr>
+			<tr>
+			
+				<td><input class="form-control form-control" type="text" name="userPw" th:field="*{userPw}" placeholder="비밀번호"/></td>
+				<td><span class="error_message" th:if="${#fields.hasErrors('userPw')}" th:errors="*{userPw}">userPw의 에러 메시지</span></td>
+			</tr>
+			<tr>
+				
+				<td><input class="form-control form-control" type="text" name="userName" th:field="*{userName}" placeholder="이름" /></td>
+				<td><span class="error_message" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}">userName의 에러 메시지</span></td>
+			</tr>
+			<tr>
+			
+				<td>
+					<select class="form-control" th:field="*{job}">
+						<option th:each="item : ${jobList}" th:value="${item.value}" th:text="${item.label}"></option>
+					</select>
+				</td>
+				<td><span class="error_message" th:if="${#fields.hasErrors('job')}" th:errors="*{job}">job의 에러 메시지</span></td>
+			</tr>
+		</table>
+	</form>
+	
+	<div>
+		<button type="submit" id="btnRegister" th:text="#{action.register}" class="btn btn-success">등록</button>
+		
+		<th:block sec:authorize="hasRole('ROLE_ADMIN')">
+			<button type="submit" id="btnList" th:text="#{action.list}">목록</button>
+		</th:block>
+	</div>
+	
+	<script th:inline="javascript">
+		$(document).ready(function() {
+	
+			var formObj = $("#member");
+	
+			$("#btnRegister").on("click", function() {
+				formObj.submit();
+			});
+		})
+
+	</script>
+</div>
+</body>
+</html>
