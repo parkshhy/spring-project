@@ -13,40 +13,38 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
- 	
-
 </head>
+
 <body style="background-color:#F0FFF0;">
 <div layout:fragment="content">
-<div style="color: #5a5a5a; font-size: 2.0em; font-weight: bold; margin-left:10px">회원 게시판</div>
-	
-	
-	<form id="board" action="list.html" th:action="@{/board/modify}" th:object="${board}" method="POST">
-		<input type="hidden" name="boardNo" th:field="*{boardNo}" />
+	<div style="color: #5a5a5a; font-size: 2.0em; font-weight: bold; margin-left:10px">회원 게시판</div>
 		
-		<input type="hidden" name="page" th:value="${pgrq.page}" />
-		<input type="hidden" name="sizePerPage" th:value="${pgrq.sizePerPage}" />
-		<input type="hidden" name="searchType" th:value="${pgrq.searchType}" />
-		<input type="hidden" name="keyword" th:value="${pgrq.keyword}" />
-		
-		<table>
-			<tr>
-				<td th:text="#{board.title}">제목</td>
-				<td><input class="form-control form-control" type="text" name="title" th:field="*{title}" /></td>
-			</tr>
-			<tr>
-				<td th:text="#{board.writer}">작성자</td>
-				<td><input class="form-control form-control" type="text" name="writer" th:field="*{writer}" readonly="readonly" /></td>
-			</tr>
-			<tr>
-				<td th:text="#{board.content}">내용</td>
-				<td><textarea id="summernote" name="content" th:field="*{content}" readonly="readonly"></textarea></td>
-			</tr>
-		</table>
-	</form>
+			<form id="board" action="list.html" th:action="@{/board/modify}" th:object="${board}" method="POST">
+				<input type="hidden" name="boardNo" th:field="*{boardNo}" />
+				
+				<!-- 현재 페이지 번호와 페이징 크기를 숨겨진 필드 요소를 사용하여 전달한다. -->
+				<input type="hidden" name="page" th:value="${pgrq.page}" />
+				<input type="hidden" name="sizePerPage" th:value="${pgrq.sizePerPage}" />
+				<input type="hidden" name="searchType" th:value="${pgrq.searchType}" />
+				<input type="hidden" name="keyword" th:value="${pgrq.keyword}" />
+				
+				<table>
+					<tr>
+						<td th:text="#{board.title}">제목</td>
+						<td><input class="form-control form-control" type="text" name="title" th:field="*{title}" /></td>
+					</tr>
+					<tr>
+						<td th:text="#{board.writer}">작성자</td>
+						<td><input class="form-control form-control" type="text" name="writer" th:field="*{writer}" readonly="readonly" /></td>
+					</tr>
+					<tr>
+						<td th:text="#{board.content}">내용</td>
+						<td><textarea id="summernote" name="content" th:field="*{content}" readonly="readonly"></textarea></td>
+					</tr>
+				</table>
+			</form>
 	
 	<div th:with="pinfo=${#authentication.principal}">
-		
 		<th:block sec:authorize="hasRole('ROLE_MEMBER')">
 	       <th:block th:if="${pinfo.username eq board.writer}">
 	       	<button type="submit" id="btnModify" class="btn btn-warning">수정</button>
@@ -56,41 +54,59 @@
 		<button type="submit" id="btnList" class="btn btn-info">목록</button>
 	</div>
 	
+	<br/>
+	 	  
+	 	  <textarea rows="5" cols="80" id="replytext"
+             placeholder="댓글을 작성하세요">
+          </textarea>
+         <br/>
+         <br/>
+         <!-- 댓글쓰기 버튼을 누르면 id값인 btnReply값이 넘어가서 -->
+         <!-- 위쪽에 있는 스크립트 구문이 실행되고 -->
+         <!-- 내가 댓글을 작성한 값이 스크립트문을 거쳐서 컨트롤러로 맵핑되게 된다. -->
+         <button type="button" id="btnReply" class="btn btn-info">댓글쓰기</button>
+	 	 <br/>
+    
+    <div class="container">
+        <div class="commentList"></div>
+    </div>
 	
 	<script th:inline="javascript">
-	 $('#summernote').summernote({
-	        placeholder: 'Hello Bootstrap 4111',
-	        tabsize: 2,
-	        height: 400
-	      });
-	
+		/////////////썸머노트///////////////
+		$('#summernote').summernote({
+		        placeholder: 'Hello Bootstrap 4111',
+		        tabsize: 2,
+		        height: 400
+		      });
+		
+	  
 		$(document).ready(function() {
 	
 			var formObj = $("#board");
-			
+						
+			////////// 현재 페이지 번호와 페이징 크기 ///////////
 			var pageObj = $("#page");
 			var sizePerPageObj = $("#sizePerPage");
 			
 			var pageVal = pageObj.val();
 			var sizePerPageVal = sizePerPageObj.val();
 			
-			
 			$("#btnModify").on("click", function() {
 				formObj.submit();
 			});
 	
 			$("#btnList").on("click", function() {
+				//페이징 관련 정보를 파라미터로 전달한다.
 				self.location = "list[(${pgrq.toUriString()})]";
 			});
 			
-			
 			$("#btnEdit").on("click", function() {
-				var boardNo = $("#boardNo");
-				var boardNoVal = boardNo.val();
+			var boardNo = $("#boardNo");
+			var boardNoVal = boardNo.val();
 				
+				//////페이징 관련 정보를 쿼리 파라미터로 전달한다.
 				self.location = "/board/modify[(${pgrq.toUriString()})]" + "&boardNo=" + boardNoVal;
 			});
-	
 			
 			$("#btnRemove").on("click", function() {
 				formObj.attr("action", "/board/remove");
@@ -98,10 +114,42 @@
 			});
 	
 			$("#btnList").on("click", function() {
+				
+				//페이징관련 정보를 쿼리 파라미터로 전달한다.
 				self.location = "/board/list[(${pgrq.toUriString()})]";
 			});
 	
 		});
+		
+			 ////////////////댓글 ajax 처리//////////////	 
+			$("#btnReply").click(function(){
+	        var replytext=$("#replytext").val(); //댓글 내용
+	        var board_no="${dto.board_no}"; //게시물 번호
+	        var param={ "replytext": replytext, "board_no": board_no};
+	        //var param="replytext="+replytext+"&bno="+bno;
+	        //async : false 이 속성을 기입하지 않으면 기본적으로 비동기식으로 동작한다.
+	        $.ajax({
+	            type: "post", //데이터를 보낼 방식
+	            url: "${path}/reply/insert.do", //데이터를 보낼 url
+	            data: param, //보낼 데이터
+	          	success: function(){ //데이터를 보내는것이 성공했을시 출력되는 메시지
+	                alert("댓글이 등록되었습니다.");
+	                listReply2(); //댓글 목록 출력
+		            }
+		        });
+		    });
+	
+			//댓글 목록 출력 함수
+			  function listReply(){
+			      $.ajax({
+			          type: "get", //get방식으로 자료를 전달한다
+			          url: "${path}/reply/list.do?bno=${dto.bno}", //컨트롤러에 있는 list.do로 맵핑하고 게시판 번호도 같이 보낸다.
+			          success: function(result){ //자료를 보내는것이 성  공했을때 출력되는 메시지
+			              //result : responseText 응답텍스트(html)
+			              $("#listReply").html(result);
+			          }
+			      });
+			  }
 	
 	</script>
 </div>

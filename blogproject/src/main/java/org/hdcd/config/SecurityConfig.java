@@ -23,11 +23,15 @@ import org.springframework.security.web.authentication.rememberme.JdbcTokenRepos
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 @EnableWebSecurity
+
+//시큐리티 어노테이션 활성화 설정
 @EnableGlobalMethodSecurity(prePostEnabled=true, securedEnabled=true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	
 	private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 	
+	
+	//데이터 소스
 	@Autowired
 	DataSource dataSource;
 	
@@ -38,21 +42,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		http.formLogin()
 		.loginPage("/auth/login")
 		.loginProcessingUrl("/login")
+		//CustomLoginSuccessHandler를 로그인 성공 처리자로 지정
 		.successHandler(createAuthenticationSuccessHandler());
 		
 		http.logout()
 		.logoutUrl("/auth/logout")
 		.invalidateHttpSession(true);
 		
+		//로그아웃을 하면 자동 로그인에 사용하는 쿠키도 삭제해 주도록 한다. 
+		//.deleteCookies("remember-me","JSESSION_ID");
+		
 		http.exceptionHandling()
+		//CustomAccessDeniedHandler를 접근 거부 처리자로 지정
 		.accessDeniedHandler(createAccessDeniedHandler());
 		
+		
+		//데이터소스를 지정하고 테이블을 이용해서 기존 로그인 정보를 기록
 		http.rememberMe()
 		.key("hdcd")
 		.tokenRepository(createJDBCRepository())
+		//쿠키의 유효시간을 지정한다.
 		.tokenValiditySeconds(60*60*24);
 	}
 	
+	//CustomUserDetailsService를 스프링 빈으로 정의한다.
 	@Bean
 	public UserDetailsService createUserDetailsService() {
 		return new CustomUserDetailService();
@@ -63,20 +76,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		return new BCryptPasswordEncoder();
 	}
 	
+	
 	@Bean
 	public AuthenticationSuccessHandler createAuthenticationSuccessHandler() {
 		return new CustomLoginSuccessHandler();
 	}
 	
+	//CustomAccessDenideHandler를 스프링 빈으로 정의한다.
 	@Bean
 	public AccessDeniedHandler createAccessDeniedHandler() {
 		return new CustomAccessDeniedHandler();
 	}
 	
+	//CustomUserDetailsService 빈을 인증 제공자에 지정한다.
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
-		auth.userDetailsService(createUserDetailsService()).passwordEncoder(createPasswordEncoder());
+		auth.userDetailsService(createUserDetailsService())
+		.passwordEncoder(createPasswordEncoder());
 	}
 	
 	private PersistentTokenRepository createJDBCRepository() {

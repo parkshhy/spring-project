@@ -2,9 +2,11 @@ package org.hdcd.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.hdcd.domain.Member;
 import org.hdcd.domain.MemberAuth;
 
+@Mapper
 public interface MemberMapper {
 
 	public Member readByUserId(String userId);

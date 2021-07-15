@@ -13,6 +13,7 @@ public class PageRequest {
 	private String searchType;
 	private String keyword;
 
+	
 	public PageRequest() {
 		this.page = 1;
 		this.sizePerPage = 10;

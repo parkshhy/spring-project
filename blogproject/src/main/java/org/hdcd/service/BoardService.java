@@ -15,8 +15,10 @@ public interface BoardService {
 
 	public void remove(Integer boardNo) throws Exception;
 
+	//페이지요청 정보를 매개변수로 받아 페이징 처리를 한 게시글 목록을 반환한다.
 	public List<Board> list(PageRequest pageRequest) throws Exception;
 	
+	//게시글 반환,검색처리된 게시글 건수를 반환한다.
 	public int count(PageRequest pageRequest) throws Exception;
 
 }

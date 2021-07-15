@@ -13,9 +13,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
+
 <body style="background-color:#F0FFF0;">
 <div layout:fragment="content">
 <div style="color: #5a5a5a; font-size: 2.0em; font-weight: bold; margin-left:10px">회원 게시판</div>
+
+	<!-- 검색 입력 폼 -->
 	<form id="pgrq" action="list.html" th:action="@{|/board/list${pgrq.toUriStringByPage(1)}|}" th:object="${pgrq}" method="GET">
 		<table>
 			<tr>
@@ -35,7 +38,7 @@
 	</form>
 
 	
-	
+	 
 	<table class="table table-hover" style="width:900px;">
 		<tr>
 			<th align="center" width="80">번호</th>
@@ -52,8 +55,11 @@
 		
 		<tr th:each="board : ${list}">
 			<td align="center" th:text="${board.boardNo}">${board.boardNo}</td>
+			
+			<!-- 게시글 상세보기 할때 페이징 요청정보를 매개변수로 전달한다. -->
 			<td align="left"><a href="read.html" th:href="@{|/board/read${pgrq.toUriString(pgrq.page)}&boardNo=${board.boardNo}|}" th:text="${board.title}">${board.title}</a></td>
 			<td  th:text="${board.writer}">${board.writer}</td>
+						
 			<td  th:text="${#dates.format(board.regDate, 'yyyy-MM-dd HH:mm')}">${board.regDate}</td>
 		</tr>
 		<tr></tr>
@@ -70,7 +76,7 @@
 	<!-- 페이징 -->
 	<div>
 	
-		<th:block th:if="${pagination.prev}">
+		<th:block th:if="${pagination.prev}"><!-- ≪ 왼쪽 꺽인 괄호 &laquo; -->
 			<a href="list.html" th:href="${pagination.startPage - 1}">&laquo;</a>
 		</th:block>
 		
@@ -78,7 +84,7 @@
 			<a href="list.html" th:href="@{|/board/list${pagination.makeQuery(idx)}|}" th:text="${idx}" style="color:red;">${idx}</a>
 		</th:block>
 	
-		<th:block th:if="${pagination.next && pagination.endPage > 0}">
+		<th:block th:if="${pagination.next && pagination.endPage > 0}"><!-- ≫ 오른쪽 꺽인 괄호 &raquo; -->
 			<a href="list.html" th:href="${pagination.endPage +1}">&raquo;</a>
 		</th:block>
 	</div>

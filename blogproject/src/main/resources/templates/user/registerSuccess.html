@@ -13,15 +13,17 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
-<body>
 
-<div layout:fragment="content">
-	<hr/>
-	<h2 style="color: green; font-size: 3.5em; font-weight: bold; margin-left:10px; text-align: center;" th:text="#{common.joinMemberSuccess(${userName})}">{0}님 가입성공</h2>
-	 <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#myModal">
-   							로그인
-  					</button>
-	<hr/>
-</div>
+<body>
+	<div layout:fragment="content">
+		 <hr/>
+		 <h2 style="color: green; font-size: 3.5em; font-weight: bold; margin-left:10px; text-align: center;" th:text="#{common.joinMemberSuccess(${userName})}">
+			{0}님 가입성공
+		 </h2>
+		 <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#myModal">
+	   		로그인
+	  	 </button>
+		<hr/>
+	</div>
 </body>
 </html>

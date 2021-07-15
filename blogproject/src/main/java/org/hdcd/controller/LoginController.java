@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/auth")
 public class LoginController {
 
+	//로그인
 	@RequestMapping("/login")
 	public String loginForm(String error, String logout, Model model) {
 		if (error != null) {
@@ -21,6 +22,7 @@ public class LoginController {
 		return "auth/loginForm";
 	}
 
+	//로그아웃
 	@RequestMapping("/logout")
 	public String logoutForm() {
 		return "auth/logoutForm";
