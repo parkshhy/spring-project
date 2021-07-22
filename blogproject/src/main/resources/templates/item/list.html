@@ -1,0 +1,90 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layouts/main_template}">
+
+<!-- 3번줄 타임리프 레이아웃 다이얼렉트를 사용하기 위해 XML 네임스페이스를 추가한다. -->
+<!-- 4번줄 layout:decorator 속성에 공통적인 템플릿으로 이용하는 Decorator 뷰이름을 지정한다. -->
+
+<head>
+  <title>블러그 메인</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body style="background-color:#F0FFF0;">
+<div layout:fragment="content">
+	<br>
+	<div style="color: #5a5a5a; font-size: 2.0em; font-weight: bold; margin-left:10px">게시판</div>
+	<br>
+	
+	
+	<table class="table table-hover" style="width:900px;">
+		<tr>
+			<th align="center" width="80" >번호</th>
+			<th align="center" width="320" >내용</th>
+			<!--<th align="center" width="100">상품가격</th> -->
+			
+			<th:block sec:authorize="hasRole('ROLE_MEMBER')">
+				<th align="center" width="80">편집</th>
+				<th align="center" width="80">삭제</th>
+			</th:block>
+			
+			<th:block sec:authorize="hasRole('ROLE_MEMBER')">
+				<th align="center" width="80">상세보기</th>
+			</th:block>
+		</tr>
+		
+		<tr th:if="${#lists.isEmpty(itemList)}">
+			<th:block sec:authorize="!hasRole('ROLE_MEMBER')">
+				<td colspan="3" th:text="#{common.listEmpty}">
+					List is empty.
+				</td>
+			</th:block>
+			
+			<th:block sec:authorize="hasRole('ROLE_MEMBER')">
+				<td colspan="5" th:text="#{common.listEmpty}">
+					List is empty.
+				</td>
+			</th:block>
+			
+			<th:block sec:authorize="hasRole('ROLE_MEMBER')">
+				<td colspan="4" th:text="#{common.listEmpty}">
+					List is empty.
+				</td>
+			</th:block>
+		</tr>
+		
+		<tr th:each="item : ${itemList}">
+				<td align="center" th:text="${item.itemId}">${item.itemId}</td>
+				<td align="left" th:text="${item.itemName}">${item.itemName}</td>
+				<!-- <td align="right" th:text="|${item.price} 원|">${item.price} 원</td> -->
+				
+			<th:block sec:authorize="hasRole('ROLE_MEMBER')">
+				<td align="center"><a href="modify.html" th:href="|modify?itemId=${item.itemId}|" >편집</a></td>
+				<td align="center"><a href="remove.html" th:href="|remove?itemId=${item.itemId}|">삭제</a></td>
+				<td align="center"><a href="read.html" th:href="|read?itemId=${item.itemId}|">보기</a></td>
+			</th:block>
+			
+		
+		</tr>
+	</table>
+	<br>
+	<th:block sec:authorize="hasRole('ROLE_MEMBER')">
+		<a href="register.html" th:href="@{/item/register}" class="btn btn-info">글쓰기</a>
+	</th:block>
+	<br>
+	<br>
+	<script th:inline="javascript">
+// 		var result = [[${msg}]];
+		
+// 		if (result === "SUCCESS") {
+// 			alert([[#{common.processSuccess}]]);
+// 		}
+	</script>
+</div>
+</body>
+</html>

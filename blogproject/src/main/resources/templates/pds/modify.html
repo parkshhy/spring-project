@@ -1,0 +1,183 @@
+ <html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layouts/main_template}">
+
+<head>
+  <title>Pds</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+</head>
+<body style="background-color:#F0FFF0;">
+<div layout:fragment="content">
+<br>
+	<h2 style="color: #5a5a5a; font-size: 2.0em; font-weight: bold; margin-left:10px">공개자료실 수정</h2>
+	<br>
+	<form id="pds" action="list.html" th:action="@{/pds/modify}" th:object="${pds}" method="POST" enctype="multipart/form-data">
+		<input type="hidden" name="itemId" th:field="*{itemId}" />		
+		
+		<table>
+			<tr>
+				<td>자료명</td>
+				<td><input type="text" name="itemName" th:field="*{itemName}" class="form-control"/></td>
+				<td><span class="error_message" th:if="${#fields.hasErrors('itemName')}" th:errors="*{itemName}">itemName의 에러 메시지</span></td>
+			</tr>
+			<tr>
+				<td th:text="#{pds.itemFile}">파일</td>
+				<td>
+					<input type="file" id="inputFile">
+	
+					<div class="uploadedList"></div>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td th:text="#{pds.itemDescription}">자료설명</td>
+				<td><textarea name="description" th:field="*{description}" class="form-control" rows="10" cols="100"></textarea></td>
+				<td><span class="error_message" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">description의 에러 메시지</span></td>
+			</tr>
+		</table>
+	</form>
+	
+	<div>
+		<button type="submit" id="btnModify" class="btn btn-warning">수정</button>
+		<button type="submit" id="btnRemove" class="btn btn-danger">삭제</button>
+		<button type="submit" id="btnList" class="btn btn-info">목록</button>
+	</div>
+	<br>
+	
+	<script th:inline="text">
+	$(document).ready(function() {
+		
+		var formObj = $("#pds");
+	
+		$("#btnRemove").on("click", function() {
+			formObj.attr("action", "/pds/remove");
+			formObj.submit();
+		});
+	
+		$("#btnList").on("click", function() {
+			self.location = "list";
+		});
+	
+	});
+	
+	$(document).ready(function() {
+		  
+		function getOriginalName(fileName){
+			var idx = fileName.indexOf("_") + 1;
+			
+			return fileName.substr(idx);
+		}
+			
+		var itemId = [[${pds.itemId}]];
+		
+		console.log("itemId : " + itemId);
+		
+		$.getJSON("/pds/getAttach/"+itemId, function(list){
+			$(list).each(function(){
+				var data = this;
+				
+				console.log("data : " + data);
+				
+				var str = "<div>" + getOriginalName(data) + "</div>";
+				  
+				$(".uploadedList").append(str);
+			});
+		});
+	
+	});
+	
+	$(document).ready(function() {
+		
+		var formObj = $("#pds");
+	
+		$("#btnModify").on("click", function() {
+			formObj.submit();
+		});
+	
+		$("#btnList").on("click", function() {
+			self.location = "list";
+		});
+	  
+		$(".uploadedList").on("click", "span", function(event){
+			$(this).parent("div").remove();
+		});
+			
+		function getOriginalName(fileName){
+			var idx = fileName.indexOf("_") + 1;
+			return fileName.substr(idx);
+		}
+		
+		var itemId = [[${pds.itemId}]];
+		
+		$.getJSON("/pds/getAttach/"+itemId,function(list){
+			$(list).each(function(){
+				
+				console.log("data : " + this);
+				
+				var data = this;
+				
+				console.log("data : " + data);
+				console.log("getOriginalName(data) : " + getOriginalName(data));
+				
+				var str = "<div><a href='/pds/downloadFile?fullName="+data+"'>" + getOriginalName(data)+"</a>" + "<span>X</span></div>";
+				  
+				$(".uploadedList").append(str);
+			});
+		});
+		
+		$("#pds").submit(function(event){
+			event.preventDefault();
+			
+			var that = $(this);
+			
+			var str ="";
+			$(".uploadedList a").each(function(index){	
+				 var value = $(this).attr("href");
+				 value = value.substr(27);
+			
+				 str += "<input type='hidden' name='files[" + index + "]' value='" + value + "'> ";
+			});
+			
+			that.append(str);
+	
+			that.get(0).submit();
+		});
+		
+		$("#inputFile").on("change", function(event){
+			var files = event.target.files;
+			var file = files[0];
+	
+			console.log(file);
+			
+			var formData = new FormData();
+			
+			formData.append("file", file);
+			
+			$.ajax({
+			  url: "/pds/uploadAjax?[[${_csrf.parameterName}]]=[[${_csrf.token}]]",
+			  data: formData,
+			  dataType:"text",
+			  processData: false,
+			  contentType: false,
+			  type: "POST",
+			  success: function(data){
+				  var str = "<div><a href='/pds/downloadFile?fullName=" + data + "'>" + getOriginalName(data) + "</a>" + "<span>X</span></div></div>";
+				  
+				  $(".uploadedList").append(str);
+			  }
+			});
+		});
+			
+	});
+	</script>
+</div>
+</body>
+</html>

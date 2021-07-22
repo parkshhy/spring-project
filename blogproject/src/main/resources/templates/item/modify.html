@@ -1,0 +1,85 @@
+ <html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layouts/main_template}">
+
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+</head>
+<body style="background-color:#F0FFF0;">
+<div layout:fragment="content">
+<br>
+	<h2 style="color: #5a5a5a; font-size: 2.0em; font-weight: bold; margin-left:10px">게시글 수정</h2>
+	<br>
+	<form id="item" action="list.html" th:action="@{/item/modify}" th:object="${item}" method="POST" enctype="multipart/form-data">
+		<input type="hidden" name="itemId" th:field="*{itemId}" />
+		<input type="hidden" name="pictureUrl" th:field="*{pictureUrl}" />
+		<input type="hidden" name="previewUrl" th:field="*{previewUrl}" />	
+	
+		<table>
+			<tr>
+				<td>제목</td>
+				<td><input type="text" name="itemName" th:field="*{itemName}" class="form-control"/></td>
+				<td><span class="error_message" th:if="${#fields.hasErrors('itemName')}" th:errors="*{itemName}">itemName의 에러 메시지</span></td>
+			</tr>
+			<!-- 
+			<tr>
+				<td th:text="#{item.itemPrice}">상품가격</td>
+				<td><input type="text" name="price" th:field="*{price}" />&nbsp;원</td>
+				<td><span class="error_message" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">price의 에러 메시지</span></td>
+			</tr> 
+			-->
+			<tr>
+				<td></td>
+				<td><img src="display?itemId=${item.itemId}" th:src="|display?itemId=${item.itemId}|" width="210" height="240"></td>
+			</tr>		
+			<tr>
+				<td>파일</td>
+				<td><input type="file" name="picture" /></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>미리보기파일</td>
+				<td><input type="file" name="preview" /></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>내용</td>
+				<td><textarea name="description" th:field="*{description}" class="form-control" rows="10" cols="100"></textarea></td>
+				<td><span class="error_message" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">description의 에러 메시지</span></td>
+			</tr>
+		</table>
+		
+	</form>
+	
+	<div>
+		<button type="submit" id="btnModify" class="btn btn-warning">수정</button>
+		<button type="submit" id="btnList" class="btn btn-info">목록</button>
+	</div>
+	<br>
+	<script>
+		$(document).ready(function() {
+	
+			var formObj = $("#item");
+	
+			$("#btnModify").on("click", function() {
+				formObj.submit();
+			});
+	
+			$("#btnList").on("click", function() {
+				self.location = "list";
+			});
+	
+		});
+	</script>
+</div>
+</body>
+</html>
