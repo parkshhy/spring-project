@@ -18,7 +18,7 @@
 <div style="color: green; font-size: 3.5em; font-weight: bold; margin-left:10px">Login</div>
 	
 	<h2 th:text="${error}" style="color:red;">${error}</h2>
-	<h2 th:text="${logout}">${logout}</h2>
+	<h2 th:text="${logout}" style="color:red;">${logout}</h2>
 	
 	<form method="post" action="../home.html" th:action="@{/login}">
 		<table>

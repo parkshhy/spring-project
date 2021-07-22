@@ -14,8 +14,8 @@
 </head>
 <body style="background-color:#F0FFF0;">
 <div layout:fragment="content">
-	<div style="color: green; font-size: 3.5em; font-weight: bold; margin-left:10px">Blog</div>
-	
+	<div style="color: green; font-size: 3.5em; font-weight: bold; margin-left:10px">Blog Join</div>
+	<br>
 	<form id="member" action="list.html" th:action="@{/user/register}" th:object="${member}" method="POST">
 		<table>
 			<tr>
@@ -44,12 +44,12 @@
 	</form>
 	
 	<div>
-		<button type="submit" id="btnRegister" th:text="#{action.register}" class="btn btn-success">등록</button>
+		<button type="submit" id="btnRegister" th:text="#{action.register}" class="btn btn-success">회원가입</button>
 		<th:block sec:authorize="hasRole('ROLE_ADMIN')">
 			<button type="submit" id="btnList" th:text="#{action.list}">목록</button>
 		</th:block>
 	</div>
-	
+	<br>
 	<script th:inline="javascript">
 		
 	$(document).ready(function() {

@@ -1,5 +1,8 @@
 <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layouts/common_template}"
+	>
 <head>
   <title>Bootstrap Example</title>
   <meta charset="utf-8">
@@ -11,62 +14,56 @@
 </head>
 
 <body >
-	<div th:fragment="header" style="background-color:#2DB400;">
-		<table style=" border-spacing: 1px; border-collapse: separate; margin-left:10px;" height="55px">
-		
-  				<!-- 로그인을 하지 않는 경우 로그인 페이지로 이동 -->
+	<div th:fragment="header" style="background: #00b09b; background: -webkit-linear-gradient(to right, #00b09b, #96c93d); background: linear-gradient(to right, #00b09b, #96c93d);">
+		<table style=" border-spacing: 1px; 
+  				border-collapse: separate; margin-left:10px;" height="55px">
 				<tr sec:authorize="!isAuthenticated()">
 					<td style="color: orange; font-size: 2.0em; font-weight: bold; margin-left:10px">Blog</td>
-					<td width="86%"></td>
-					<td width="100" align="right"><a style=" text-decoration-line: none;" href="../user/register.html" th:href="@{/user/register}" class="btn btn-info">회원가입</a></td>
+					<td width="87%"></td>
+					<td width="80" align="right"><a style=" text-decoration-line: none;" href="../user/register.html" th:href="@{/user/register}"><font color="white">회원가입</font></a></td>
 			        <td width="80" align="right">
-			        	<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#myModal">
+			        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
    							로그인
-  						</button>
-  					</td>
+  					</button></td>
 		       	</tr>
-		       	
-		       	<!-- 로그인을 거친 인증된 사용자인 경우 사용자명을 보여주고 로그아웃 페이지로 이동할수 있게 한다. -->    	
-		        <tr sec:authorize="isAuthenticated()">
-					<td style="color: orange; font-size: 1.0em; font-weight: bold; margin-left:10px"><span sec:authentication="principal.username">로그인한 유저이름</span>  로그인 중</td>
-					<td>
-						<form action="loginForm.html" th:action="@{/auth/logout}" method="post">
+	        <tr sec:authorize="isAuthenticated()">
+				<td style="color: orange; font-size: 1.0em; font-weight: bold; margin-left:10px"><span sec:authentication="principal.username">로그인한 유저이름</span>  로그인 중</td>
+				<td><form action="loginForm.html" th:action="@{/auth/logout}" method="post">
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-						<button style="margin-top:17px" class="btn btn-danger">로그아웃</button></form>
-					</td>
-		        </tr>	        
+						<button style="margin-top:17px" th:text="#{action.logout}" class="btn btn-danger">로그아웃</button></form></td>
+	        </tr>
 		</table>
-	</div>
-	
-	
-	<!-- 로그인 모달창 -->
-	<div class="modal fade" id="myModal" >
+		<div class="modal fade" id="myModal" >
     <div class="modal-dialog modal-dialog-centered">
-     	 <div class="modal-content" style="background-color:#F0FFF0; text-align: center;">
-      		<div style="color: green; font-size: 3.5em; font-weight: bold; margin-left:10px; text-align: center;">Login</div>
-				<h2 th:text="${error}">${error}</h2>
-				<h2 th:text="${logout}">${logout}</h2>
+      <div class="modal-content" style="background-color:#F0FFF0; text-align: center;">
+      	<div style="color: green; font-size: 3.5em; font-weight: bold; margin-left:10px; text-align: center;">Login</div>
+      	
+	<h2 th:text="${error}">${error}</h2>
+	<h2 th:text="${logout}">${logout}</h2>
 	
-					<form method="post" action="../home.html" th:action="@{/login}">
-						<table style="margin-left: auto; margin-right: auto;">
-							<tr>
-								<td><input class="form-control form-control" type="text" name="username" value="아이디"></td>
-							</tr>
-							<tr>
-								<td><input class="form-control form-control" type="password" name="password" value="비밀번호"></td>
-							</tr>
-							<tr>
-								<td><input type="checkbox" name="remember-me"><span>로그인 상태 유지</span></td>
-							</tr>
-							<tr>
-								<td colspan="2" align="center"><button class="btn btn-info">로그인</button></td>
-							</tr>
-						</table>
-						
-						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-					</form>
-			</div>
-     	</div>
+	<form method="post" action="../home.html" th:action="@{/login}">
+		<table style="margin-left: auto; margin-right: auto;">
+			<tr>
+				<td><input class="form-control form-control" type="text" name="username" value="아이디"></td>
+			</tr>
+			<tr>
+				<td><input class="form-control form-control" type="password" name="password" value="비밀번호"></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="remember-me"><span th:text="#{auth.rememberMe}">로그인 상태 유지</span></td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center"><button th:text="#{action.login}" class="btn btn-info">로그인</button></td>
+			</tr>
+		</table>
+	
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+	</form>
+</div>
+     
+      </div>
     </div>
+  </div>
+	
 </body>
 </html>

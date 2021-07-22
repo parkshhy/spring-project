@@ -21,4 +21,7 @@ public interface BoardService {
 	//게시글 반환,검색처리된 게시글 건수를 반환한다.
 	public int count(PageRequest pageRequest) throws Exception;
 
+	
+	
+	
 }

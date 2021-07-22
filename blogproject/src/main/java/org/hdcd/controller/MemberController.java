@@ -12,8 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -29,7 +30,7 @@ public class MemberController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
-	@RequestMapping(value = "/register", method = RequestMethod.GET)
+	@GetMapping("/register")
 	public void registerForm(Member member, Model model) throws Exception {
 		String classCode = "A01";
 		List<CodeLabelValue> jobList = codeService.getCodeList(classCode);
@@ -37,7 +38,7 @@ public class MemberController {
 		model.addAttribute("jobList", jobList);
 	}
 
-	@RequestMapping(value = "/register", method = RequestMethod.POST)
+	@PostMapping("/register")
 	public String register(@Validated Member member, BindingResult result, Model model, RedirectAttributes rttr) throws Exception {
 		if(result.hasErrors()) {
 			String classCode = "A01";
@@ -57,12 +58,12 @@ public class MemberController {
 		return "redirect:/user/registerSuccess";
 	}
 	
-	@RequestMapping(value = "/registerSuccess", method = RequestMethod.GET)
+	@GetMapping("/registerSuccess")
 	public void registerSuccess(Model model) throws Exception {
 		
 	}
 
-	@RequestMapping(value = "/read", method = RequestMethod.GET)
+	@GetMapping("/read")
 	public void read(int userNo, Model model) throws Exception {
 		String classCode = "A01";
 		List<CodeLabelValue> jobList = codeService.getCodeList(classCode);
@@ -73,7 +74,7 @@ public class MemberController {
 	}
 
 
-	@RequestMapping(value = "/modify", method = RequestMethod.GET)
+	@GetMapping("/modify")
 	public void modifyForm(int userNo, Model model) throws Exception {
 		String classCode = "A01";
 		List<CodeLabelValue> jobList = codeService.getCodeList(classCode);
@@ -83,7 +84,7 @@ public class MemberController {
 		model.addAttribute(service.read(userNo));
 	}
 
-	@RequestMapping(value = "/modify", method = RequestMethod.POST)
+	@PostMapping("/modify")
 	public String modify(Member member, RedirectAttributes rttr) throws Exception {
 		service.modify(member);
 

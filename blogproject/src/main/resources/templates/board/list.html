@@ -16,8 +16,9 @@
 
 <body style="background-color:#F0FFF0;">
 <div layout:fragment="content">
+<br>
 <div style="color: #5a5a5a; font-size: 2.0em; font-weight: bold; margin-left:10px">회원 게시판</div>
-
+<br>
 	<!-- 검색 입력 폼 -->
 	<form id="pgrq" action="list.html" th:action="@{|/board/list${pgrq.toUriStringByPage(1)}|}" th:object="${pgrq}" method="GET">
 		<table>
@@ -89,14 +90,17 @@
 		</th:block>
 	</div>
 	
-
+	<br>
 	
 	<script th:inline="javascript">
-		var result = [[${msg}]];
+	
+	/* var result = [[${msg}]];
 		
 		if (result === "SUCCESS") {
 			alert([[#{common.processSuccess}]]);
 		}
+		*/		
+		
 	</script>
 </div>
 </body>

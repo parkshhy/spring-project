@@ -8,17 +8,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <!-- MyBatis 사용 목적 중 하나는 DAO로부터 SQL문을 분리하는 것이다.
      분리된 SQL문은 SQL mapper 파일에 작성하며 DAO에서는 SqlSession 객체가 SQL mapper 파일을 참조하게 된다. -->
 
-
-
-
-
-
-
-
-
-
-
-
 	<mapper namespace="org.hdcd.mapper.BoardMapper">
 		
 		<!-- 이 구문의 이름은 selectPerson이고 int타입의 파라미터를 가진다. 그리고 결과 데이터는 HashMap 에 저장된다.-->
@@ -65,8 +54,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 				-->		
   	 	</select>
-
-	
 
 		<insert id="insertAuthor" parameterType="domain.blog.Author" flushCache="true"  statementType="PREPARED"  
 				keyProperty=""  keyColumn=""  timeout="20">

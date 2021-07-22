@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<!-- 다른 mapper와 중복되지 않도록 네임스페이스 기재 mapper를 구별하는 식별자 역할-->
+	<mapper namespace="org.hdcd.mapper.CommentMapper">
+	    	
+	    	 <select id="commentCount" resultType="int">
+		        SELECT
+		            COUNT(*)
+		        FROM COMMENT
+    		</select>
+		    
+		    <select id="commentList" resultType="org.hdcd.domain.Comment">
+		        SELECT
+		            *
+		        FROM COMMENT
+		    	where BOARD_NO = #{board_no}
+		    </select>
+    
+    	    <insert id="commentInsert" parameterType="org.hdcd.domain.Comment">
+		        INSERT INTO
+		        COMMENT (CNO, BOARD_NO, CONTENT, WRITER, REG_DATE)
+		        VALUES(#{cno},#{board_no},#{content},#{writer},now()) 
+		    </insert>
+    
+		    <update id="commentUpdate" parameterType="org.hdcd.domain.Comment">
+		        UPDATE COMMENT
+		            SET
+		            CONTENT = #{content}
+		        WHERE CNO = #{cno}
+		    </update>
+		    
+		    <delete id="commentDelete" parameterType="int">
+		        DELETE FROM COMMENT WHERE CNO = #{cno}
+		    </delete>
+			    
+			</mapper>
+

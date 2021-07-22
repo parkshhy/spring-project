@@ -11,6 +11,10 @@ public class LoginController {
 	//로그인
 	@RequestMapping("/login")
 	public String loginForm(String error, String logout, Model model) {
+		
+		//session.setAttribute("CSRF_TOKEN",UUID.randomUUID().toString());
+
+		
 		if (error != null) {
 			model.addAttribute("error", "로그인 에러");
 		}

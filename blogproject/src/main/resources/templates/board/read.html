@@ -4,9 +4,14 @@
 	layout:decorate="~{/layouts/main_template}">
 
 <head>
-  <title>Board</title>
+  <title>board</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.parameterName}"/>
+  
+  
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -15,10 +20,13 @@
   <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
 </head>
 
+
+
 <body style="background-color:#F0FFF0;">
 <div layout:fragment="content">
+<br>
 	<div style="color: #5a5a5a; font-size: 2.0em; font-weight: bold; margin-left:10px">회원 게시판</div>
-		
+	<br>	
 			<form id="board" action="list.html" th:action="@{/board/modify}" th:object="${board}" method="POST">
 				<input type="hidden" name="boardNo" th:field="*{boardNo}" />
 				
@@ -45,39 +53,200 @@
 			</form>
 	
 	<div th:with="pinfo=${#authentication.principal}">
+
 		<th:block sec:authorize="hasRole('ROLE_MEMBER')">
 	       <th:block th:if="${pinfo.username eq board.writer}">
 	       	<button type="submit" id="btnModify" class="btn btn-warning">수정</button>
 	       	<button type="submit" id="btnRemove" class="btn btn-danger">삭제</button>
 	       </th:block>
 		</th:block>
+	
 		<button type="submit" id="btnList" class="btn btn-info">목록</button>
 	</div>
 	
 	<br/>
-	 	  
-	 	  <textarea rows="5" cols="80" id="replytext"
-             placeholder="댓글을 작성하세요">
-          </textarea>
-         <br/>
-         <br/>
-         <!-- 댓글쓰기 버튼을 누르면 id값인 btnReply값이 넘어가서 -->
-         <!-- 위쪽에 있는 스크립트 구문이 실행되고 -->
-         <!-- 내가 댓글을 작성한 값이 스크립트문을 거쳐서 컨트롤러로 맵핑되게 된다. -->
-         <button type="button" id="btnReply" class="btn btn-info">댓글쓰기</button>
 	 	 <br/>
     
+    <div class="form-group">
+        <form name="commentInsertForm">
+            <div class="form-group" style="text-align:center;">
+               <input type="hidden" name="board_no" th:value="${board.boardNo}"/>
+          
+               <input type="text" style="text-align: center;" size="90" id="content" name="content" placeholder="댓글내용을 입력하세요." >
+               <span class="input-group-btn">
+                    <button class="btn btn-info"  type="button" name="commentInsertBtn">등록</button>
+                    <!-- <button type="button" id="ajaxCall">AJAX Call</button> -->
+			   </span>
+              </div>
+        </form>
+    </div>
+    <br>
     <div class="container">
         <div class="commentList"></div>
     </div>
-	
+
+
+	<!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
+		
 	<script th:inline="javascript">
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
+	
+	
+	$(function() {
+		$("#ajaxCall").click(function(){
+			ajaxCall();
+		});
+	});
+	
+	function ajaxCall(){
+		
+		var name = $("#commentInsertBtn").val();
+		var jsonData = {
+			"test" : "AjaxTokenTest"
+		}
+
+		$.ajax({
+			type: 'POST',
+			url:'/comment/list',
+			data: JSON.stringify(jsonData),
+// 			contentType: "application/json",
+			dataType: 'json',
+			beforeSend : function(xhr)
+            {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+				xhr.setRequestHeader("X-CSRF-TOKEN", token);
+            },
+			success: function(data){
+				console.log("결과값 : ", data);
+			},
+			error:function(xhr,status,error){
+				console.log('error:'+error);
+			}
+		});
+	}
+	
+	
+	//var board_no = '${board_no}'; //게시글 번호 
+	var board_no = $('input[name=board_no]').val(); //게시글 번호 
+	
+	$('[name=commentInsertBtn]').click(function(){ //댓글 등록 버튼 클릭시 
+	    var insertData = $('[name=commentInsertForm]').serialize(); //commentInsertForm의 내용을 가져옴
+	    commentInsert(insertData); //Insert 함수호출(아래)
+	});
+	 
+	 
+	 
+	//댓글 목록 
+	function commentList(){
+	    $.ajax({
+	        url : '/comment/list',
+	        type : 'GET',
+	        data : {'board_no':board_no},
+	        success : function(data){
+	            var a =''; 
+	            $.each(data, function(key, value){ 
+	                a += '<div class="commentArea" style="border-bottom:1px solid darkgray; margin-bottom: 15px;">';
+	                a += '<div class="commentInfo'+value.cno+'">'+'댓글번호 : '+value.cno+' / 작성자 : '+value.writer+' / 날짜 : '+value.reg_data;
+	     		    a += '<a onclick="commentUpdate('+value.cno+',\''+value.content+'\');" class="btn btn-warning"> 수정 </a>';
+	                a += '<a onclick="commentDelete('+value.cno+');" class="btn btn-danger"> 삭제 </a> </div>';
+	                a += '<div class="commentContent'+value.cno+'"> <p> 내용 : '+value.content +'</p>';
+	                "${#dates.format(comment.reg_data, 'yyyy-MM-dd HH:mm')}"
+	                
+	                a += '</div></div>';
+	            });
+	            
+	            $(".commentList").html(a);
+	        }
+	    });
+	}
+	 
+	//댓글 등록
+	function commentInsert(insertData){
+		
+		
+	    $.ajax({
+	        url : '/comment/insert',
+	        type : 'POST',
+	        data : insertData,
+	        dataType: 'json',
+			beforeSend : function(xhr)
+            {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+				xhr.setRequestHeader("X-CSRF-TOKEN", token);
+            },
+	        success : function(data){
+	            if(data == 1) {
+	                commentList(); //댓글 작성 후 댓글 목록 reload
+	                $('[name=content]').val('');
+	            }
+	        }
+	    });
+	}
+	 
+	//댓글 수정 - 댓글 내용 출력을 input 폼으로 변경 
+	function commentUpdate(cno, content){
+	    var a ='';
+	    
+	    a += '<div class="input-group">';
+	    a += '<input type="text" class="form-control" name="content_'+cno+'" value="'+content+'"/>';
+	    a += '<span class="input-group-btn"><button class="btn btn-warning" type="button" onclick="commentUpdateProc('+cno+');" >수정</button> </span>';
+	    a += '</div>';
+	    
+	    $('.commentContent'+cno).html(a);
+	    
+	}
+	 
+	//댓글 수정
+	function commentUpdateProc(cno){
+	    var updateContent = $('[name=content_'+cno+']').val();
+	    
+	    $.ajax({
+	        url : '/comment/update',
+	        type : 'PUT',
+	        data : {'content' : updateContent, 'cno' : cno},
+	        dataType: 'json',
+			beforeSend : function(xhr)
+            {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+				xhr.setRequestHeader("X-CSRF-TOKEN", token);
+            },
+	        success : function(data){
+	            if(data == 1) commentList(board_no); //댓글 수정후 목록 출력 
+	        }
+	    });
+	}
+	 
+	//댓글 삭제 
+	function commentDelete(cno){
+	    $.ajax({
+	        url : '/comment/delete/'+cno,
+	        type : 'DELETE',
+	        dataType: 'json',
+			beforeSend : function(xhr)
+            {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+				xhr.setRequestHeader("X-CSRF-TOKEN", token);
+            },
+	        success : function(data){
+	            if(data == 1) commentList(board_no); //댓글 삭제후 목록 출력 
+	        }
+	    });
+	}
+	 
+	 
+	 
+	 
+	$(document).ready(function(){
+	    commentList(); //페이지 로딩시 댓글 목록 출력 
+	});
+	
+	
+// 		var csrfHeaderName = "{_csff.headerName}";
+// 		var csrfTokenValue = "${_csrf.token}";
+	
 		/////////////썸머노트///////////////
 		$('#summernote').summernote({
-		        placeholder: 'Hello Bootstrap 4111',
-		        tabsize: 2,
-		        height: 400
-		      });
+				 placeholder: 'hello',
+			     tabsize: 2,
+			     height: 400
+	    });
 		
 	  
 		$(document).ready(function() {
@@ -120,36 +289,6 @@
 			});
 	
 		});
-		
-			 ////////////////댓글 ajax 처리//////////////	 
-			$("#btnReply").click(function(){
-	        var replytext=$("#replytext").val(); //댓글 내용
-	        var board_no="${dto.board_no}"; //게시물 번호
-	        var param={ "replytext": replytext, "board_no": board_no};
-	        //var param="replytext="+replytext+"&bno="+bno;
-	        //async : false 이 속성을 기입하지 않으면 기본적으로 비동기식으로 동작한다.
-	        $.ajax({
-	            type: "post", //데이터를 보낼 방식
-	            url: "${path}/reply/insert.do", //데이터를 보낼 url
-	            data: param, //보낼 데이터
-	          	success: function(){ //데이터를 보내는것이 성공했을시 출력되는 메시지
-	                alert("댓글이 등록되었습니다.");
-	                listReply2(); //댓글 목록 출력
-		            }
-		        });
-		    });
-	
-			//댓글 목록 출력 함수
-			  function listReply(){
-			      $.ajax({
-			          type: "get", //get방식으로 자료를 전달한다
-			          url: "${path}/reply/list.do?bno=${dto.bno}", //컨트롤러에 있는 list.do로 맵핑하고 게시판 번호도 같이 보낸다.
-			          success: function(result){ //자료를 보내는것이 성  공했을때 출력되는 메시지
-			              //result : responseText 응답텍스트(html)
-			              $("#listReply").html(result);
-			          }
-			      });
-			  }
 	
 	</script>
 </div>

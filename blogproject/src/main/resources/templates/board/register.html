@@ -4,9 +4,11 @@
 	layout:decorate="~{/layouts/main_template}">
 
 <head>
-  <title>Bootstrap Example</title>
+  <title>insert</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.parameterName}"/>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -17,28 +19,47 @@
 
 <body style="background-color:#F0FFF0;">
 <div layout:fragment="content">
-
+<br>
 	
-	<h2>회원게시판</h2>
-
+	<h2 style="color: #5a5a5a; font-size: 2.0em; font-weight: bold; margin-left:10px">회원게시판</h2>
+	<br>
 	<form id="board" action="list.html" th:action="@{/board/register}" th:object="${board}" method="POST">
 		<table>
 			<tr>
 				<td>제목</td>
-				<td><input type="text" name="title" th:field="*{title}" /></td>
+				<td><input class="form-control form-control" type="text" name="title" th:field="*{title}" /></td>
 				<td><span class="error_message" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">title의 에러 메시지</span></td>
 			</tr>
 			<tr>
 				<td>작성자</td>
-				<td><input type="text" name="writer" th:field="*{writer}" readonly="readonly" /></td>
+				<td><input class="form-control form-control" type="text" name="writer" th:field="*{writer}" readonly="readonly" /></td>
 				<td><span class="error_message" th:if="${#fields.hasErrors('writer')}" th:errors="*{writer}">writer의 에러 메시지</span></td>
 			</tr>
 			<tr>
 				<td>내용</td>
 				<td><textarea id="summernote" name="content" th:field="*{content}"></textarea></td>
 				<td><span class="error_message" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">content의 에러 메시지</span></td>
+				<!--  원본
+				<td>내용</td>
+				<td><textarea id="summernote" name="content" th:field="*{content}"></textarea></td>
+				<td><span class="error_message" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">content의 에러 메시지</span></td>
+				-->
+				<!--  
+				<td></td>
+				<td><textarea name="BOARD_CONTENT" id="board_content"></textarea></td>
+				<td><span class="error_message" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">content의 에러 메시지</span></td>
+				-->
 			</tr>
 		</table>
+		
+	<!--  
+		<div class="form-group">
+			<label for="board_content">내용</label>
+			<textarea name="BOARD_CONTENT" id="board_content"></textarea>
+		</div>
+	-->	
+		
+		
 	</form>
 	
 	
@@ -50,9 +71,14 @@
 		<button type="submit" id="btnList" class="btn btn-info">목록</button>
 	</div>
 	
+	<br>
+	<!-- C:\Users\ParkSangHyun\AppData\Local\Temp\tomcat.8080.15123303606874366278\work\Tomcat\localhost\ROOT\null -->
+	<script th:inline="javascript">
 	
-	<script>
-		$(document).ready(function() {
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
+
+	$(document).ready(function() {
 	
 			var formObj = $("#board");
 	
@@ -63,14 +89,68 @@
 			$("#btnList").on("click", function() {
 				self.location = "list";
 			});
+			
+			$('#summernote').summernote({
+				height: 300,                 // 에디터 높이
+				minHeight: null,             // 최소 높이
+				maxHeight: null,             // 최대 높이
+				focus: true,                  // 에디터 로딩후 포커스를 맞출지 여부
+				lang: "ko-KR",					// 한글 설정
+				placeholder: '내용을 입력하시오',	//placeholder 설정
+				enctype: 'multipart/form-data', //파일업로드 할때 설정
+				beforeSend : function(xhr)
+	            {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+					xhr.setRequestHeader("X-CSRF-TOKEN", token);
+	            },
+				callbacks: {	//여기 부분이 이미지를 첨부하는 부분
+					onImageUpload : function(files) {
+// 						alert("이미지업로드111111");
+						uploadSummernoteImageFile(files[0],this);
+// 						alert("이미지업로드222222");
+					},
+					onPaste: function (e) {
+						var clipboardData = e.originalEvent.clipboardData;
+						if (clipboardData && clipboardData.items && clipboardData.items.length) {
+							var item = clipboardData.items[0];
+							if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
+								e.preventDefault();
+							}
+						}
+					}
+				}
+		          
+			});
 	
 		});
-		
-		 $('#summernote').summernote({
-		        placeholder: 'Hello Bootstrap 4',
-		        tabsize: 2,
-		        height: 400
-		      });
+	
+	
+	/**
+	* 이미지 파일 업로드
+	*/
+	function uploadSummernoteImageFile(file, editor) {
+		data = new FormData();
+		data.append("file", file);
+		alert("이미지업로드");
+		$.ajax({
+			data : data,
+			type : "POST",
+			url : "/board/uploadSummernoteImageFile",
+			contentType : false,
+			processData : false,
+			beforeSend : function(xhr)
+            {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+				xhr.setRequestHeader("X-CSRF-TOKEN", token);
+            },
+           
+			success : function(data) {
+            	//항상 업로드된 파일의 url이 있어야 한다.
+            	console.log("data", data);
+       			$(editor).summernote('insertImage', data.url);
+			}
+		});
+	}
+	
+		 
 	</script>
 </div>
 </body>

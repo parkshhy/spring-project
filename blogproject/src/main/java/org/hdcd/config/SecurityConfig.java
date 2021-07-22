@@ -38,7 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		logger.info("security config ...");
-		
+		//http.csrf().disable();
 		http.formLogin()
 		.loginPage("/auth/login")
 		.loginProcessingUrl("/login")
@@ -63,6 +63,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		.tokenRepository(createJDBCRepository())
 		//쿠키의 유효시간을 지정한다.
 		.tokenValiditySeconds(60*60*24);
+		
+
+		
 	}
 	
 	//CustomUserDetailsService를 스프링 빈으로 정의한다.
